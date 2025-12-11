@@ -2,6 +2,9 @@ class App {
     constructor() {
         this.currentPage = 'menu';
         this.editingEmpresa = null;
+        this.editingCandidato = null;
+        this.aptitudesTemp = [];
+        this.aptitudEditandoIndex = -1;
         this.data = {
             ofertas: [],
             empresas: [
@@ -10,10 +13,15 @@ class App {
                 { id: 3, nombre: 'Digital Minds', cuil: '20-55555555-5', razonSocial: 'Digital Minds LTDA', descripcion: 'Agencia digital' },
                 { id: 4, nombre: 'Global Services', cuil: '20-11111111-2', razonSocial: 'Global Services Inc', descripcion: 'Servicios globales' }
             ],
-            candidatos: [],
+            candidatos: [
+                { id: 1, nombre: 'Juan Perez', legajo: '12345', telefono: '1123456789', carrera: 'Ingeniería Informática', graduado: true },
+                { id: 2, nombre: 'María García', legajo: '12346', telefono: '1187654321', carrera: 'Ingeniería en Sistemas', graduado: false },
+                { id: 3, nombre: 'Carlos López', legajo: '12347', telefono: '1155555555', carrera: 'Administración', graduado: true }
+            ],
             postulaciones: []
         };
         this.nextEmpresaId = 5;
+        this.nextCandidatoId = 4;
         this.init();
     }
 
@@ -123,7 +131,6 @@ class App {
         return `
             <div class="container">
                 <div class="header">
-                    <button class="back-btn" onclick="app.navigateTo('ofertas')">← Volver</button>
                     <h1>Guardar Alta Oferta</h1>
                 </div>
                 
@@ -330,7 +337,6 @@ class App {
         return `
             <div class="container">
                 <div class="header">
-                    <button class="back-btn" onclick="app.navigateTo('empresas')">← Volver</button>
                     <h1>${titulo}</h1>
                 </div>
                 <div style="padding: 20px;">
@@ -364,6 +370,26 @@ class App {
     }
 
     renderCandidatos() {
+        const candidatosFilas = this.data.candidatos.map(candidato => `
+            <tr>
+                <td>${candidato.nombre}</td>
+                <td>${candidato.legajo}</td>
+                <td>${candidato.telefono}</td>
+                <td>${candidato.carrera}</td>
+                <td>${candidato.graduado ? 'Sí' : 'No'}</td>
+                <td>
+                    <button class="icon-btn edit" onclick="app.editarCandidato(${candidato.id})" title="Editar">✎</button>
+                    <button class="icon-btn delete" onclick="app.eliminarCandidato(${candidato.id})" title="Eliminar">🗑</button>
+                </td>
+            </tr>
+        `).join('');
+
+        const filasVacias = this.data.candidatos.length === 0 ? `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: #999;">Sin candidatos registrados</td>
+            </tr>
+        ` : '';
+
         return `
             <div class="container">
                 <div class="header">
@@ -372,8 +398,8 @@ class App {
                 <div style="padding: 20px;">
                     <div class="search-bar">
                         <div class="search-input-group">
-                            <input type="text" placeholder="Buscar candidato...">
-                            <button class="btn btn-secondary">🔍</button>
+                            <input type="text" placeholder="Buscar candidato..." id="searchCandidato">
+                            <button class="btn btn-secondary" onclick="app.buscarCandidatos()">🔍</button>
                             <button class="btn btn-primary" onclick="app.navigateTo('alta-candidato')">+</button>
                         </div>
                     </div>
@@ -391,14 +417,12 @@ class App {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="6" style="text-align: center; padding: 40px; color: #999;">Sin candidatos registrados</td>
-                                </tr>
+                                ${candidatosFilas}
+                                ${filasVacias}
                             </tbody>
                         </table>
                     </div>
                     
-                    <div class="action-buttons">
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Salir</button>
                     </div>
@@ -407,44 +431,71 @@ class App {
         `;
     }
     renderAltaCandidato() {
+        const titulo = this.editingCandidato ? 'Editar Candidato' : 'Registrar Candidato';
+        const candidato = this.editingCandidato || { nombre: '', legajo: '', telefono: '', carrera: 'Seleccionar...', graduado: false, aptitudes: [] };
+        const graduadoSi = candidato.graduado ? 'checked' : '';
+        const graduadoNo = !candidato.graduado ? 'checked' : '';
+        
+        // Si estamos editando, cargar las aptitudes del candidato
+        if (this.editingCandidato && this.editingCandidato.aptitudes) {
+            this.aptitudesTemp = [...this.editingCandidato.aptitudes];
+        } else if (!this.editingCandidato && this.aptitudesTemp.length === 0) {
+            this.aptitudesTemp = [];
+        }
+        
+        const aptitudesFilas = this.aptitudesTemp.map((aptitud, index) => `
+            <tr>
+                <td>${aptitud}</td>
+                <td>
+                    <button class="icon-btn edit" onclick="app.editarAptitud(${index})" title="Editar">✎</button>
+                    <button class="icon-btn delete" onclick="app.eliminarAptitud(${index})" title="Eliminar">🗑</button>
+                </td>
+            </tr>
+        `).join('');
+
+        const filasVacias = this.aptitudesTemp.length === 0 ? `
+            <tr>
+                <td colspan="2" style="text-align: center; padding: 30px; color: #999;">Sin aptitudes registradas</td>
+            </tr>
+        ` : '';
+        
         return `
             <div class="container">
                 <div class="header">
-                    <button class="back-btn" onclick="app.navigateTo('candidatos')">← Volver</button>
-                    <h1>Registrar Candidato</h1>
+                    <h1>${titulo}</h1>
                 </div>
                 <div style="padding: 20px;">
                     <div class="form-group">
                         <label>Nombre y Apellido:</label>
-                        <input type="text" placeholder="">
+                        <input type="text" id="nombreCandidato" placeholder="" value="${candidato.nombre}">
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label>Legajo:</label>
-                            <input type="text" placeholder="">
+                            <input type="text" id="legajoCandidato" placeholder="" value="${candidato.legajo}">
                         </div>
                         <div class="form-group">
                             <label>Teléfono:</label>
-                            <input type="tel" placeholder="">
+                            <input type="tel" id="telefonoCandidato" placeholder="" value="${candidato.telefono}">
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label>Carrera:</label>
-                        <select>
-                            <option>Seleccionar...</option>
-                            <option>Ingeniería Informática</option>
-                            <option>Ingeniería en Sistemas</option>
-                            <option>Administración</option>
+                        <select id="carreraCandidato">
+                            <option value="Seleccionar...">Seleccionar...</option>
+                            <option value="Ingeniería Informática" ${candidato.carrera === 'Ingeniería Informática' ? 'selected' : ''}>Ingeniería Informática</option>
+                            <option value="Ingeniería en Sistemas" ${candidato.carrera === 'Ingeniería en Sistemas' ? 'selected' : ''}>Ingeniería en Sistemas</option>
+                            <option value="Administración" ${candidato.carrera === 'Administración' ? 'selected' : ''}>Administración</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label>¿Es graduado?</label>
                         <div class="radio-group">
-                            <label><input type="radio" name="graduado"> Sí</label>
-                            <label><input type="radio" name="graduado"> No</label>
+                            <label><input type="radio" id="graduadoSi" name="graduado" value="true" ${graduadoSi}> Sí</label>
+                            <label><input type="radio" id="graduadoNo" name="graduado" value="false" ${graduadoNo}> No</label>
                         </div>
                     </div>
                     
@@ -456,8 +507,8 @@ class App {
                     <div class="form-group">
                         <label>Aptitud:</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="text" placeholder="">
-                            <button class="btn btn-primary btn-small">+</button>
+                            <input type="text" id="inputAptitud" placeholder="Ej: JavaScript, Python, etc.">
+                            <button class="btn btn-primary btn-small" onclick="app.agregarAptitud()">+</button>
                         </div>
                     </div>
                     
@@ -471,17 +522,31 @@ class App {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td colspan="2" style="text-align: center; padding: 30px; color: #999;">Sin aptitudes registradas</td>
-                                    </tr>
+                                    ${aptitudesFilas}
+                                    ${filasVacias}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-primary">Guardar</button>
+                        <button class="btn btn-primary" onclick="app.guardarCandidato()">Guardar</button>
                         <button class="btn btn-secondary" onclick="app.navigateTo('candidatos')">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para editar aptitud -->
+            <div id="modalAptitud" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000;">
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); width: 400px; max-width: 90%;">
+                    <h2 style="margin-top: 0; margin-bottom: 20px;">Editar Aptitud</h2>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Aptitud:</label>
+                        <input type="text" id="modalInputAptitud" placeholder="Ej: JavaScript, Python, etc." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="app.cerrarModalAptitud()">Cancelar</button>
+                        <button class="btn btn-primary" onclick="app.guardarAptitudModal()">Guardar</button>
                     </div>
                 </div>
             </div>
@@ -492,7 +557,6 @@ class App {
         return `
             <div class="container">
                 <div class="header">
-                    <button class="back-btn" onclick="app.navigateTo('ofertas')">← Volver</button>
                     <h1>Postulaciones de la Oferta</h1>
                 </div>
                 <div style="padding: 20px;">
@@ -534,7 +598,6 @@ class App {
         return `
             <div class="container">
                 <div class="header">
-                    <button class="back-btn" onclick="app.navigateTo('postulaciones')">← Volver</button>
                     <h1>Registrar Postulación</h1>
                 </div>
                 <div style="padding: 20px;">
@@ -579,6 +642,23 @@ class App {
                 document.querySelector(`[data-content="${tabName}"]`).classList.add('active');
             });
         });
+
+        // Cerrar modal al hacer click fuera de él
+        const modal = document.getElementById('modalAptitud');
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.cerrarModalAptitud();
+                }
+            });
+
+            // Cerrar modal con tecla Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'block') {
+                    this.cerrarModalAptitud();
+                }
+            });
+        }
     }
 
     guardarEmpresa() {
@@ -660,6 +740,167 @@ class App {
 
         const tablaBody = document.querySelector('table tbody');
         tablaBody.innerHTML = empresasFilas || `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">Sin resultados</td></tr>`;
+    }
+
+    guardarCandidato() {
+        const nombre = document.getElementById('nombreCandidato').value.trim();
+        const legajo = document.getElementById('legajoCandidato').value.trim();
+        const telefono = document.getElementById('telefonoCandidato').value.trim();
+        const carrera = document.getElementById('carreraCandidato').value;
+        const graduado = document.getElementById('graduadoSi').checked;
+
+        if (!nombre || !legajo || !telefono || carrera === 'Seleccionar...') {
+            alert('Por favor, completa todos los campos requeridos');
+            return;
+        }
+
+        if (this.editingCandidato) {
+            const candidatoIndex = this.data.candidatos.findIndex(c => c.id === this.editingCandidato.id);
+            if (candidatoIndex !== -1) {
+                this.data.candidatos[candidatoIndex] = {
+                    id: this.editingCandidato.id,
+                    nombre,
+                    legajo,
+                    telefono,
+                    carrera,
+                    graduado,
+                    aptitudes: this.aptitudesTemp
+                };
+            }
+            this.editingCandidato = null;
+        } else {
+            this.data.candidatos.push({
+                id: this.nextCandidatoId++,
+                nombre,
+                legajo,
+                telefono,
+                carrera,
+                graduado,
+                aptitudes: this.aptitudesTemp
+            });
+        }
+
+        this.aptitudesTemp = [];
+        alert('Candidato guardado correctamente');
+        this.navigateTo('candidatos');
+    }
+
+    editarCandidato(id) {
+        const candidato = this.data.candidatos.find(c => c.id === id);
+        if (candidato) {
+            this.editingCandidato = candidato;
+            this.navigateTo('alta-candidato');
+        }
+    }
+
+    eliminarCandidato(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este candidato?')) {
+            this.data.candidatos = this.data.candidatos.filter(c => c.id !== id);
+            this.render();
+            this.attachEventListeners();
+        }
+    }
+
+    buscarCandidatos() {
+        const searchTerm = document.getElementById('searchCandidato').value.toLowerCase();
+        const candidatosFiltrados = this.data.candidatos.filter(candidato => 
+            candidato.nombre.toLowerCase().includes(searchTerm) ||
+            candidato.legajo.toLowerCase().includes(searchTerm) ||
+            candidato.telefono.toLowerCase().includes(searchTerm)
+        );
+
+        const candidatosFilas = candidatosFiltrados.map(candidato => `
+            <tr>
+                <td>${candidato.nombre}</td>
+                <td>${candidato.legajo}</td>
+                <td>${candidato.telefono}</td>
+                <td>${candidato.carrera}</td>
+                <td>${candidato.graduado ? 'Sí' : 'No'}</td>
+                <td>
+                    <button class="icon-btn edit" onclick="app.editarCandidato(${candidato.id})" title="Editar">✎</button>
+                    <button class="icon-btn delete" onclick="app.eliminarCandidato(${candidato.id})" title="Eliminar">🗑</button>
+                </td>
+            </tr>
+        `).join('');
+
+        const tablaBody = document.querySelector('table tbody');
+        tablaBody.innerHTML = candidatosFilas || `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">Sin resultados</td></tr>`;
+    }
+
+    agregarAptitud() {
+        const inputAptitud = document.getElementById('inputAptitud');
+        const aptitud = inputAptitud.value.trim();
+
+        if (!aptitud) {
+            alert('Por favor, ingresa una aptitud');
+            return;
+        }
+
+        this.aptitudesTemp.push(aptitud);
+        inputAptitud.value = '';
+        
+        // Actualizar solo la tabla sin hacer un full render
+        this.actualizarTablaAptitudes();
+    }
+
+    actualizarTablaAptitudes() {
+        const aptitudesFilas = this.aptitudesTemp.map((aptitud, index) => `
+            <tr>
+                <td>${aptitud}</td>
+                <td>
+                    <button class="icon-btn edit" onclick="app.editarAptitud(${index})" title="Editar">✎</button>
+                    <button class="icon-btn delete" onclick="app.eliminarAptitud(${index})" title="Eliminar">🗑</button>
+                </td>
+            </tr>
+        `).join('');
+
+        const filasVacias = this.aptitudesTemp.length === 0 ? `
+            <tr>
+                <td colspan="2" style="text-align: center; padding: 30px; color: #999;">Sin aptitudes registradas</td>
+            </tr>
+        ` : '';
+
+        const tablaBody = document.querySelector('.form-group .table-wrapper table tbody');
+        if (tablaBody) {
+            tablaBody.innerHTML = aptitudesFilas + filasVacias;
+        }
+    }
+
+    editarAptitud(index) {
+        const modal = document.getElementById('modalAptitud');
+        const modalInput = document.getElementById('modalInputAptitud');
+        this.aptitudEditandoIndex = index;
+        modalInput.value = this.aptitudesTemp[index];
+        modal.style.display = 'block';
+        modalInput.focus();
+    }
+
+    guardarAptitudModal() {
+        const modalInput = document.getElementById('modalInputAptitud');
+        const aptitud = modalInput.value.trim();
+
+        if (!aptitud) {
+            alert('Por favor, ingresa una aptitud');
+            return;
+        }
+
+        this.aptitudesTemp[this.aptitudEditandoIndex] = aptitud;
+        this.cerrarModalAptitud();
+        this.actualizarTablaAptitudes();
+    }
+
+    cerrarModalAptitud() {
+        const modal = document.getElementById('modalAptitud');
+        modal.style.display = 'none';
+        this.aptitudEditandoIndex = -1;
+    }
+
+    eliminarAptitud(index) {
+        this.aptitudesTemp.splice(index, 1);
+        if (this.aptitudEditandoIndex === index) {
+            this.aptitudEditandoIndex = -1;
+        }
+        this.actualizarTablaAptitudes();
     }
 }
 
