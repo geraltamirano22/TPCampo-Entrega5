@@ -77,13 +77,13 @@ class App {
             <div class="container">
                 <div class="header">
                     <h1>Ofertas</h1>
-                    <button class="btn btn-primary" onclick="app.navigateTo('alta-oferta')">+ Nueva Oferta</button>
                 </div>
                 <div style="padding: 20px;">
                     <div class="search-bar">
                         <div class="search-input-group">
                             <input type="text" placeholder="Buscar ofertas...">
                             <button class="btn btn-secondary">🔍</button>
+                            <button class="btn btn-primary" onclick="app.navigateTo('alta-oferta')">+</button>
                         </div>
                     </div>
                     
@@ -112,8 +112,7 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Volver</button>
-                        <button class="btn btn-primary" onclick="app.navigateTo('alta-oferta')">Guardar Nueva Oferta</button>
+                        <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Salir</button>
                     </div>
                 </div>
             </div>
@@ -254,8 +253,8 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('ofertas')">Cancelar</button>
                         <button class="btn btn-primary">Guardar</button>
+                        <button class="btn btn-secondary" onclick="app.navigateTo('ofertas')">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -287,13 +286,13 @@ class App {
             <div class="container">
                 <div class="header">
                     <h1>Empresas</h1>
-                    <button class="btn btn-primary" onclick="app.navigateTo('alta-empresa')">+ Nueva Empresa</button>
                 </div>
                 <div style="padding: 20px;">
                     <div class="search-bar">
                         <div class="search-input-group">
                             <input type="text" placeholder="Buscar empresa..." id="searchEmpresa">
                             <button class="btn btn-secondary" onclick="app.buscarEmpresas()">🔍</button>
+                            <button class="btn btn-primary" onclick="app.navigateTo('alta-empresa')">+</button>
                         </div>
                     </div>
                     
@@ -317,8 +316,7 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Volver</button>
-                        <button class="btn btn-primary" onclick="app.navigateTo('alta-empresa')">Guardar Nueva Empresa</button>
+                        <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Salir</button>
                     </div>
                 </div>
             </div>
@@ -357,8 +355,8 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('empresas')">Cancelar</button>
                         <button class="btn btn-primary" onclick="app.guardarEmpresa()">Guardar</button>
+                        <button class="btn btn-secondary" onclick="app.navigateTo('empresas')">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -370,13 +368,13 @@ class App {
             <div class="container">
                 <div class="header">
                     <h1>Candidatos</h1>
-                    <button class="btn btn-primary" onclick="app.navigateTo('alta-candidato')">+ Nuevo Candidato</button>
                 </div>
                 <div style="padding: 20px;">
                     <div class="search-bar">
                         <div class="search-input-group">
                             <input type="text" placeholder="Buscar candidato...">
                             <button class="btn btn-secondary">🔍</button>
+                            <button class="btn btn-primary" onclick="app.navigateTo('alta-candidato')">+</button>
                         </div>
                     </div>
                     
@@ -401,14 +399,13 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Volver</button>
-                        <button class="btn btn-primary" onclick="app.navigateTo('alta-candidato')">Guardar Nuevo Candidato</button>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Salir</button>
                     </div>
                 </div>
             </div>
         `;
     }
-
     renderAltaCandidato() {
         return `
             <div class="container">
@@ -453,7 +450,7 @@ class App {
                     
                     <div class="form-group">
                         <label>Curriculum:</label>
-                        <input type="text" placeholder="Elegir archivo...">
+                        <input type="file" id="cvCandidato">
                     </div>
                     
                     <div class="form-group">
@@ -483,8 +480,8 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('candidatos')">Cancelar</button>
                         <button class="btn btn-primary">Guardar</button>
+                        <button class="btn btn-secondary" onclick="app.navigateTo('candidatos')">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -503,7 +500,7 @@ class App {
                         <div class="search-input-group">
                             <input type="text" placeholder="Buscar postulación...">
                             <button class="btn btn-secondary">🔍</button>
-                            <button class="btn btn-primary" onclick="app.navigateTo('alta-postulacion')">+ Nueva</button>
+                            <button class="btn btn-primary" onclick="app.navigateTo('alta-postulacion')">+</button>
                         </div>
                     </div>
                     
@@ -526,15 +523,14 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('ofertas')">Volver</button>
                         <button class="btn btn-primary" onclick="app.navigateTo('alta-postulacion')">Guardar Nueva Postulación</button>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="app.navigateTo('ofertas')">Salir</button>
                     </div>
                 </div>
             </div>
         `;
-    }
-
-    renderAltaPostulacion() {
+    }enderAltaPostulacion() {
         return `
             <div class="container">
                 <div class="header">
@@ -563,8 +559,8 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="app.navigateTo('postulaciones')">Cancelar</button>
                         <button class="btn btn-primary">Guardar</button>
+                        <button class="btn btn-secondary" onclick="app.navigateTo('postulaciones')">Cancelar</button>
                     </div>
                 </div>
             </div>
