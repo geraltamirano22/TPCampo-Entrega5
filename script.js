@@ -2,19 +2,31 @@ class App {
     constructor() {
         this.currentPage = 'menu';
         this.editingEmpresa = null;
-        this.data = {
-            ofertas: [],
-            empresas: [
-                { id: 1, nombre: 'Tech Solutions', cuil: '20-12345678-9', razonSocial: 'Tech Solutions SA', descripcion: 'Empresa de tecnología' },
-                { id: 2, nombre: 'Innovation Corp', cuil: '20-98765432-1', razonSocial: 'Innovation Corp SRL', descripcion: 'Consultoría empresarial' },
-                { id: 3, nombre: 'Digital Minds', cuil: '20-55555555-5', razonSocial: 'Digital Minds LTDA', descripcion: 'Agencia digital' },
-                { id: 4, nombre: 'Global Services', cuil: '20-11111111-2', razonSocial: 'Global Services Inc', descripcion: 'Servicios globales' }
-            ],
-            candidatos: [],
-            postulaciones: []
-        };
-        this.nextEmpresaId = 5;
+        
+        // Cargar datos del localStorage o usar valores por defecto
+        const savedData = localStorage.getItem('sistemaGestionData');
+        if (savedData) {
+            this.data = JSON.parse(savedData);
+        } else {
+            this.data = {
+                ofertas: [],
+                empresas: [
+                    { id: 1, nombre: 'Tech Solutions', cuil: '20-12345678-9', razonSocial: 'Tech Solutions SA', descripcion: 'Empresa de tecnología' },
+                    { id: 2, nombre: 'Innovation Corp', cuil: '20-98765432-1', razonSocial: 'Innovation Corp SRL', descripcion: 'Consultoría empresarial' },
+                    { id: 3, nombre: 'Digital Minds', cuil: '20-55555555-5', razonSocial: 'Digital Minds LTDA', descripcion: 'Agencia digital' },
+                    { id: 4, nombre: 'Global Services', cuil: '20-11111111-2', razonSocial: 'Global Services Inc', descripcion: 'Servicios globales' }
+                ],
+                candidatos: [],
+                postulaciones: []
+            };
+        }
+        
+        this.nextEmpresaId = this.data.empresas.length > 0 ? Math.max(...this.data.empresas.map(e => e.id)) + 1 : 1;
         this.init();
+    }
+
+    saveData() {
+        localStorage.setItem('sistemaGestionData', JSON.stringify(this.data));
     }
 
     init() {
@@ -22,10 +34,25 @@ class App {
         this.attachEventListeners();
     }
 
-    navigateTo(page) {
+    navigateTo(page, returnTo = null) {
         this.currentPage = page;
+        if (returnTo) {
+            this.returnTo = returnTo;
+        } else if (page === 'menu') {
+            this.returnTo = null;
+        }
         this.render();
         this.attachEventListeners();
+    }
+
+    navigateBack(defaultPage) {
+        if (this.returnTo) {
+            const returnPage = this.returnTo;
+            this.returnTo = null;
+            this.navigateTo(returnPage);
+        } else {
+            this.navigateTo(defaultPage);
+        }
     }
 
     render() {
@@ -73,6 +100,29 @@ class App {
     }
 
     renderOfertas() {
+        const ofertasFilas = this.data.ofertas.map(oferta => `
+            <tr>
+                <td>${oferta.titulo}</td>
+                <td>${oferta.categoria}</td>
+                <td>${oferta.descripcion.substring(0, 50)}${oferta.descripcion.length > 50 ? '...' : ''}</td>
+                <td><span style="background: #d4edda; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${oferta.estado}</span></td>
+                <td>${oferta.fechaLimite}</td>
+                <td>${oferta.modalidad}</td>
+                <td>${oferta.ubicacion.localidad}, ${oferta.ubicacion.provincia}</td>
+                <td>${oferta.areaEstudio}</td>
+                <td>${oferta.empresa.nombre}</td>
+                <td>
+                    <button class="icon-btn delete" onclick="app.eliminarOferta(${oferta.id})" title="Eliminar">🗑</button>
+                </td>
+            </tr>
+        `).join('');
+
+        const filasVacias = this.data.ofertas.length === 0 ? `
+            <tr>
+                <td colspan="10" style="text-align: center; padding: 40px; color: #999;">Sin ofertas registradas</td>
+            </tr>
+        ` : '';
+
         return `
             <div class="container">
                 <div class="header">
@@ -104,9 +154,8 @@ class App {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="10" style="text-align: center; padding: 40px; color: #999;">Sin ofertas registradas</td>
-                                </tr>
+                                ${ofertasFilas}
+                                ${filasVacias}
                             </tbody>
                         </table>
                     </div>
@@ -120,6 +169,9 @@ class App {
     }
 
     renderAltaOferta() {
+        const empresasOptions = this.data.empresas.map(e => `<option value="${e.nombre}">`).join('');
+        const candidatosOptions = this.data.candidatos ? this.data.candidatos.map(c => `<option value="${c.nombre}">`).join('') : '';
+
         return `
             <div class="container">
                 <div class="header">
@@ -138,47 +190,47 @@ class App {
                     <div class="tab-content active" data-content="oferta">
                         <div class="form-group">
                             <label>Título:</label>
-                            <input type="text" placeholder="Título de la oferta">
+                            <input type="text" id="tituloOferta" placeholder="Título de la oferta">
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Fecha Límite:</label>
-                                <input type="date">
+                                <input type="date" id="fechaLimiteOferta">
                             </div>
                             <div></div>
                         </div>
                         
                         <div class="form-group">
                             <label>Categoría:</label>
-                            <select>
-                                <option>Seleccionar...</option>
-                                <option>IT</option>
-                                <option>Administrativo</option>
-                                <option>Ventas</option>
+                            <select id="categoriaOferta">
+                                <option value="">Seleccionar...</option>
+                                <option value="IT">IT</option>
+                                <option value="Administrativo">Administrativo</option>
+                                <option value="Ventas">Ventas</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label>Descripción:</label>
-                            <textarea placeholder="Inserte una descripción..."></textarea>
+                            <textarea id="descripcionOferta" placeholder="Inserte una descripción..."></textarea>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Modalidad:</label>
-                                <select>
-                                    <option>Presencial</option>
-                                    <option>Remoto</option>
-                                    <option>Híbrido</option>
+                                <select id="modalidadOferta">
+                                    <option value="Presencial">Presencial</option>
+                                    <option value="Remoto">Remoto</option>
+                                    <option value="Híbrido">Híbrido</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Área de estudio:</label>
-                                <select>
-                                    <option>Seleccionar...</option>
-                                    <option>Tecnología</option>
-                                    <option>Administración</option>
+                                <select id="areaEstudioOferta">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Tecnología">Tecnología</option>
+                                    <option value="Administración">Administración</option>
                                 </select>
                             </div>
                         </div>
@@ -189,50 +241,50 @@ class App {
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Calle:</label>
-                                <input type="text" placeholder="">
+                                <input type="text" id="calleOferta" placeholder="">
                             </div>
                             <div class="form-group">
                                 <label>Número:</label>
-                                <input type="text" placeholder="">
+                                <input type="text" id="numeroOferta" placeholder="">
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Piso:</label>
-                                <input type="text" placeholder="">
+                                <input type="text" id="pisoOferta" placeholder="">
                             </div>
                             <div class="form-group">
                                 <label>Departamento:</label>
-                                <input type="text" placeholder="">
+                                <input type="text" id="deptoOferta" placeholder="">
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label>País:</label>
-                                <select>
-                                    <option>Seleccionar...</option>
-                                    <option>Argentina</option>
-                                    <option>Chile</option>
+                                <select id="paisOferta">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Argentina">Argentina</option>
+                                    <option value="Chile">Chile</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Provincia:</label>
-                                <select>
-                                    <option>Seleccionar...</option>
-                                    <option>Buenos Aires</option>
-                                    <option>Córdoba</option>
+                                <select id="provinciaOferta">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Buenos Aires">Buenos Aires</option>
+                                    <option value="Córdoba">Córdoba</option>
                                 </select>
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <label>Localidad:</label>
-                            <select>
-                                <option>Seleccionar...</option>
-                                <option>La Plata</option>
-                                <option>Berazategui</option>
+                            <select id="localidadOferta">
+                                <option value="">Seleccionar...</option>
+                                <option value="La Plata">La Plata</option>
+                                <option value="Berazategui">Berazategui</option>
                             </select>
                         </div>
                     </div>
@@ -241,19 +293,29 @@ class App {
                     <div class="tab-content" data-content="entidades">
                         <div class="form-group">
                             <label>Empresa:</label>
-                            <select>
-                                <option>Seleccionar empresa...</option>
-                            </select>
+                            <div class="search-input-group">
+                                <input type="text" id="empresaOferta" list="listaEmpresas" placeholder="Buscar empresa...">
+                                <datalist id="listaEmpresas">
+                                    ${empresasOptions}
+                                </datalist>
+                                <button class="btn btn-primary" onclick="app.navigateTo('alta-empresa', 'alta-oferta')" title="Nueva Empresa">+</button>
+                            </div>
                         </div>
                         
                         <div class="form-group">
-                            <label>Contacto:</label>
-                            <input type="text" placeholder="Nombre del contacto">
+                            <label>Candidato:</label>
+                            <div class="search-input-group">
+                                <input type="text" id="candidatoOferta" list="listaCandidatos" placeholder="Buscar candidato...">
+                                <datalist id="listaCandidatos">
+                                    ${candidatosOptions}
+                                </datalist>
+                                <button class="btn btn-primary" onclick="app.navigateTo('alta-candidato', 'alta-oferta')" title="Nuevo Candidato">+</button>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-primary">Guardar</button>
+                        <button class="btn btn-primary" onclick="app.guardarOferta()">Guardar</button>
                         <button class="btn btn-secondary" onclick="app.navigateTo('ofertas')">Cancelar</button>
                     </div>
                 </div>
@@ -330,7 +392,7 @@ class App {
         return `
             <div class="container">
                 <div class="header">
-                    <button class="back-btn" onclick="app.navigateTo('empresas')">← Volver</button>
+                    <button class="back-btn" onclick="app.navigateBack('empresas')">← Volver</button>
                     <h1>${titulo}</h1>
                 </div>
                 <div style="padding: 20px;">
@@ -356,7 +418,7 @@ class App {
                     
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="app.guardarEmpresa()">Guardar</button>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('empresas')">Cancelar</button>
+                        <button class="btn btn-secondary" onclick="app.navigateBack('empresas')">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -399,7 +461,6 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                    <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="app.navigateTo('menu')">Salir</button>
                     </div>
                 </div>
@@ -410,29 +471,29 @@ class App {
         return `
             <div class="container">
                 <div class="header">
-                    <button class="back-btn" onclick="app.navigateTo('candidatos')">← Volver</button>
+                    <button class="back-btn" onclick="app.navigateBack('candidatos')">← Volver</button>
                     <h1>Registrar Candidato</h1>
                 </div>
                 <div style="padding: 20px;">
                     <div class="form-group">
                         <label>Nombre y Apellido:</label>
-                        <input type="text" placeholder="">
+                        <input type="text" id="nombreCandidato" placeholder="">
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label>Legajo:</label>
-                            <input type="text" placeholder="">
+                            <input type="text" id="legajoCandidato" placeholder="">
                         </div>
                         <div class="form-group">
                             <label>Teléfono:</label>
-                            <input type="tel" placeholder="">
+                            <input type="tel" id="telefonoCandidato" placeholder="">
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label>Carrera:</label>
-                        <select>
+                        <select id="carreraCandidato">
                             <option>Seleccionar...</option>
                             <option>Ingeniería Informática</option>
                             <option>Ingeniería en Sistemas</option>
@@ -443,8 +504,8 @@ class App {
                     <div class="form-group">
                         <label>¿Es graduado?</label>
                         <div class="radio-group">
-                            <label><input type="radio" name="graduado"> Sí</label>
-                            <label><input type="radio" name="graduado"> No</label>
+                            <label><input type="radio" name="graduado" value="si"> Sí</label>
+                            <label><input type="radio" name="graduado" value="no" checked> No</label>
                         </div>
                     </div>
                     
@@ -480,12 +541,39 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-primary">Guardar</button>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('candidatos')">Cancelar</button>
+                        <button class="btn btn-primary" onclick="app.guardarCandidato()">Guardar</button>
+                        <button class="btn btn-secondary" onclick="app.navigateBack('candidatos')">Cancelar</button>
                     </div>
                 </div>
             </div>
         `;
+    }
+
+    guardarCandidato() {
+        const nombre = document.getElementById('nombreCandidato').value.trim();
+        const legajo = document.getElementById('legajoCandidato').value.trim();
+        const telefono = document.getElementById('telefonoCandidato').value.trim();
+        const carrera = document.getElementById('carreraCandidato').value;
+        
+        if (!nombre || !legajo) {
+            alert('Por favor, completa los campos obligatorios (Nombre, Legajo)');
+            return;
+        }
+
+        const nuevoCandidato = {
+            id: Date.now(),
+            nombre,
+            legajo,
+            telefono,
+            carrera,
+            graduado: document.querySelector('input[name="graduado"]:checked').value === 'si'
+        };
+
+        this.data.candidatos.push(nuevoCandidato);
+        this.saveData();
+        
+        alert('Candidato guardado correctamente');
+        this.navigateBack('candidatos');
     }
 
     renderPostulaciones() {
@@ -523,14 +611,14 @@ class App {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="app.navigateTo('alta-postulacion')">Guardar Nueva Postulación</button>
-                    <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="app.navigateTo('ofertas')">Salir</button>
                     </div>
                 </div>
             </div>
         `;
-    }enderAltaPostulacion() {
+    }
+
+    renderAltaPostulacion() {
         return `
             <div class="container">
                 <div class="header">
@@ -581,6 +669,83 @@ class App {
         });
     }
 
+    eliminarOferta(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar esta oferta?')) {
+            this.data.ofertas = this.data.ofertas.filter(o => o.id !== id);
+            this.saveData();
+            this.render();
+            this.attachEventListeners();
+        }
+    }
+
+    guardarOferta() {
+        // Obtener valores del formulario
+        const titulo = document.getElementById('tituloOferta').value;
+        const fechaLimite = document.getElementById('fechaLimiteOferta').value;
+        const categoria = document.getElementById('categoriaOferta').value;
+        const descripcion = document.getElementById('descripcionOferta').value;
+        const modalidad = document.getElementById('modalidadOferta').value;
+        const areaEstudio = document.getElementById('areaEstudioOferta').value;
+        
+        const calle = document.getElementById('calleOferta').value;
+        const numero = document.getElementById('numeroOferta').value;
+        const piso = document.getElementById('pisoOferta').value;
+        const depto = document.getElementById('deptoOferta').value;
+        const pais = document.getElementById('paisOferta').value;
+        const provincia = document.getElementById('provinciaOferta').value;
+        const localidad = document.getElementById('localidadOferta').value;
+        
+        const empresaNombre = document.getElementById('empresaOferta').value;
+        const candidatoNombre = document.getElementById('candidatoOferta').value;
+
+        if (!titulo || !fechaLimite || !categoria || !empresaNombre || !calle || !numero || !pais || !provincia || !localidad) {
+            let faltantes = [];
+            if (!titulo) faltantes.push("Título");
+            if (!fechaLimite) faltantes.push("Fecha Límite");
+            if (!categoria) faltantes.push("Categoría");
+            if (!empresaNombre) faltantes.push("Empresa");
+            if (!calle) faltantes.push("Calle");
+            if (!numero) faltantes.push("Número");
+            if (!pais) faltantes.push("País");
+            if (!provincia) faltantes.push("Provincia");
+            if (!localidad) faltantes.push("Localidad");
+            
+            alert('Por favor, completa los siguientes campos obligatorios: ' + faltantes.join(', '));
+            return;
+        }
+
+        const empresa = this.data.empresas.find(e => e.nombre === empresaNombre);
+        const candidato = this.data.candidatos ? this.data.candidatos.find(c => c.nombre === candidatoNombre) : null;
+
+        const nuevaOferta = {
+            id: Date.now(), // ID simple basado en timestamp
+            titulo,
+            fechaLimite,
+            categoria,
+            descripcion,
+            modalidad,
+            areaEstudio,
+            ubicacion: {
+                calle, numero, piso, depto, pais, provincia, localidad
+            },
+            empresa: {
+                id: empresa ? empresa.id : null,
+                nombre: empresaNombre
+            },
+            candidato: {
+                id: candidato ? candidato.id : null,
+                nombre: candidatoNombre
+            },
+            estado: 'Activa'
+        };
+
+        this.data.ofertas.push(nuevaOferta);
+        this.saveData();
+        
+        alert('Oferta guardada correctamente');
+        this.navigateTo('ofertas');
+    }
+
     guardarEmpresa() {
         const nombre = document.getElementById('nombreEmpresa').value.trim();
         const cuil = document.getElementById('cuilEmpresa').value.trim();
@@ -616,8 +781,9 @@ class App {
             });
         }
 
+        this.saveData();
         alert('Empresa guardada correctamente');
-        this.navigateTo('empresas');
+        this.navigateBack('empresas');
     }
 
     editarEmpresa(id) {
@@ -631,6 +797,7 @@ class App {
     eliminarEmpresa(id) {
         if (confirm('¿Estás seguro de que deseas eliminar esta empresa?')) {
             this.data.empresas = this.data.empresas.filter(e => e.id !== id);
+            this.saveData();
             this.render();
             this.attachEventListeners();
         }
