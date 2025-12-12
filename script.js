@@ -3,10 +3,38 @@ class App {
         this.currentPage = 'menu';
         this.editingEmpresa = null;
         this.editingCandidato = null;
+        this.editingOferta = null;
+        this.editingPostulacion = null;
+        this.ofertaSeleccionadaId = null;
         this.aptitudesTemp = [];
         this.aptitudEditandoIndex = -1;
         this.data = {
-            ofertas: [],
+            ofertas: [
+                {
+                    id: 1,
+                    titulo: 'Dev Backend',
+                    categoria: 'IT',
+                    descripcion: 'API REST con Node.js y PostgreSQL',
+                    estado: 'Activa',
+                    fechaLimite: '2025-12-31',
+                    modalidad: 'Remoto',
+                    areaEstudio: 'Tecnología',
+                    ubicacion: { calle: 'Calle 10', numero: '123', piso: '', depto: '', pais: 'Argentina', provincia: 'Buenos Aires', localidad: 'La Plata' },
+                    empresa: { id: 1, nombre: 'Tech Solutions' }
+                },
+                {
+                    id: 2,
+                    titulo: 'Analista Funcional',
+                    categoria: 'Administrativo',
+                    descripcion: 'Relevamiento, user stories y testing de aceptación',
+                    estado: 'Activa',
+                    fechaLimite: '2026-01-15',
+                    modalidad: 'Híbrido',
+                    areaEstudio: 'Administración',
+                    ubicacion: { calle: 'Av. Siempre Viva', numero: '742', piso: '2', depto: 'B', pais: 'Argentina', provincia: 'Buenos Aires', localidad: 'La Plata' },
+                    empresa: { id: 2, nombre: 'Innovation Corp' }
+                }
+            ],
             empresas: [
                 { id: 1, nombre: 'Tech Solutions', cuil: '20-12345678-9', razonSocial: 'Tech Solutions SA', descripcion: 'Empresa de tecnología' },
                 { id: 2, nombre: 'Innovation Corp', cuil: '20-98765432-1', razonSocial: 'Innovation Corp SRL', descripcion: 'Consultoría empresarial' },
@@ -22,6 +50,7 @@ class App {
         };
         this.nextEmpresaId = 5;
         this.nextCandidatoId = 4;
+        this.nextOfertaId = 3;
         this.init();
     }
 
@@ -110,8 +139,10 @@ class App {
                 <td>${oferta.modalidad}</td>
                 <td>${oferta.ubicacion.localidad}, ${oferta.ubicacion.provincia}</td>
                 <td>${oferta.areaEstudio}</td>
-                <td>${oferta.empresa.nombre}</td>
-                <td>
+                <td><button class="btn btn-secondary btn-small" onclick="app.mostrarDetalleEmpresaOferta(${oferta.id})">${oferta.empresa.nombre}</button></td>
+                <td style="display: flex; gap: 8px; align-items: center;">
+                    <a href="#" style="cursor:pointer; color:#0066cc; text-decoration:underline; white-space: nowrap;" onclick="app.verPostulacionesOferta(${oferta.id}); return false;">Postulaciones</a>
+                    <button class="icon-btn edit" onclick="app.editarOferta(${oferta.id})" title="Editar">✎</button>
                     <button class="icon-btn delete" onclick="app.eliminarOferta(${oferta.id})" title="Eliminar">🗑</button>
                 </td>
             </tr>
@@ -133,12 +164,12 @@ class App {
                         <div class="search-input-group">
                             <input type="text" placeholder="Buscar ofertas...">
                             <button class="btn btn-secondary">🔍</button>
-                            <button class="btn btn-primary" onclick="app.navigateTo('alta-oferta')">+</button>
+                            <button class="btn btn-primary" onclick="app.irAltaOfertaNueva()">+</button>
                         </div>
                     </div>
                     
                     <div class="table-wrapper">
-                        <table>
+                        <table style="table-layout: auto; width: 100%;">
                             <thead>
                                 <tr>
                                     <th>Título</th>
@@ -150,7 +181,7 @@ class App {
                                     <th>Ubicación</th>
                                     <th>Área Estudio</th>
                                     <th>Empresa</th>
-                                    <th>Acciones</th>
+                                    <th style="min-width: 220px;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -165,17 +196,43 @@ class App {
                     </div>
                 </div>
             </div>
+
+            <!-- Modal genérico para detalles -->
+            <div id="modalDetalle" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.45); z-index: 2000;">
+                <div style="position:absolute; top:50%; left:50%; transform: translate(-50%, -50%); background:white; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.25); width:420px; max-width:90%;">
+                    <div style="padding:16px 20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                        <h3 id="modalDetalleTitulo" style="margin:0; font-size:18px;">Detalle</h3>
+                        <button style="border:none; background:none; font-size:18px; cursor:pointer;" onclick="app.cerrarModalDetalle()">×</button>
+                    </div>
+                    <div id="modalDetalleContenido" style="padding:16px 20px; white-space:pre-line; line-height:1.4;"></div>
+                    <div style="padding:12px 20px; border-top:1px solid #eee; display:flex; justify-content:flex-end;">
+                        <button class="btn btn-secondary" onclick="app.cerrarModalDetalle()">Cerrar</button>
+                    </div>
+                </div>
+            </div>
         `;
     }
 
     renderAltaOferta() {
+        const oferta = this.editingOferta || {
+            titulo: '',
+            fechaLimite: '',
+            categoria: '',
+            descripcion: '',
+            modalidad: 'Presencial',
+            areaEstudio: '',
+            ubicacion: { calle: '', numero: '', piso: '', depto: '', pais: '', provincia: '', localidad: '' },
+            empresa: { nombre: '' },
+            candidato: { nombre: '' }
+        };
+        const tituloPantalla = this.editingOferta ? 'Editar Oferta' : 'Guardar Alta Oferta';
         const empresasOptions = this.data.empresas.map(e => `<option value="${e.nombre}">`).join('');
         const candidatosOptions = this.data.candidatos ? this.data.candidatos.map(c => `<option value="${c.nombre}">`).join('') : '';
 
         return `
             <div class="container">
                 <div class="header">
-                    <h1>Guardar Alta Oferta</h1>
+                    <h1>${tituloPantalla}</h1>
                 </div>
                 
                 <div class="tabs">
@@ -189,13 +246,13 @@ class App {
                     <div class="tab-content active" data-content="oferta">
                         <div class="form-group">
                             <label>Título:</label>
-                            <input type="text" id="tituloOferta" placeholder="Título de la oferta">
+                            <input type="text" id="tituloOferta" placeholder="Título de la oferta" value="${oferta.titulo}">
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Fecha Límite:</label>
-                                <input type="date" id="fechaLimiteOferta">
+                                <input type="date" id="fechaLimiteOferta" value="${oferta.fechaLimite}">
                             </div>
                             <div></div>
                         </div>
@@ -204,32 +261,32 @@ class App {
                             <label>Categoría:</label>
                             <select id="categoriaOferta">
                                 <option value="">Seleccionar...</option>
-                                <option value="IT">IT</option>
-                                <option value="Administrativo">Administrativo</option>
-                                <option value="Ventas">Ventas</option>
+                                <option value="IT" ${oferta.categoria === 'IT' ? 'selected' : ''}>IT</option>
+                                <option value="Administrativo" ${oferta.categoria === 'Administrativo' ? 'selected' : ''}>Administrativo</option>
+                                <option value="Ventas" ${oferta.categoria === 'Ventas' ? 'selected' : ''}>Ventas</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label>Descripción:</label>
-                            <textarea id="descripcionOferta" placeholder="Inserte una descripción..."></textarea>
+                            <textarea id="descripcionOferta" placeholder="Inserte una descripción...">${oferta.descripcion}</textarea>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Modalidad:</label>
                                 <select id="modalidadOferta">
-                                    <option value="Presencial">Presencial</option>
-                                    <option value="Remoto">Remoto</option>
-                                    <option value="Híbrido">Híbrido</option>
+                                    <option value="Presencial" ${oferta.modalidad === 'Presencial' ? 'selected' : ''}>Presencial</option>
+                                    <option value="Remoto" ${oferta.modalidad === 'Remoto' ? 'selected' : ''}>Remoto</option>
+                                    <option value="Híbrido" ${oferta.modalidad === 'Híbrido' ? 'selected' : ''}>Híbrido</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Área de estudio:</label>
                                 <select id="areaEstudioOferta">
                                     <option value="">Seleccionar...</option>
-                                    <option value="Tecnología">Tecnología</option>
-                                    <option value="Administración">Administración</option>
+                                    <option value="Tecnología" ${oferta.areaEstudio === 'Tecnología' ? 'selected' : ''}>Tecnología</option>
+                                    <option value="Administración" ${oferta.areaEstudio === 'Administración' ? 'selected' : ''}>Administración</option>
                                 </select>
                             </div>
                         </div>
@@ -240,22 +297,22 @@ class App {
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Calle:</label>
-                                <input type="text" id="calleOferta" placeholder="">
+                                <input type="text" id="calleOferta" placeholder="" value="${oferta.ubicacion.calle}">
                             </div>
                             <div class="form-group">
                                 <label>Número:</label>
-                                <input type="text" id="numeroOferta" placeholder="">
+                                <input type="text" id="numeroOferta" placeholder="" value="${oferta.ubicacion.numero}">
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Piso:</label>
-                                <input type="text" id="pisoOferta" placeholder="">
+                                <input type="text" id="pisoOferta" placeholder="" value="${oferta.ubicacion.piso}">
                             </div>
                             <div class="form-group">
                                 <label>Departamento:</label>
-                                <input type="text" id="deptoOferta" placeholder="">
+                                <input type="text" id="deptoOferta" placeholder="" value="${oferta.ubicacion.depto}">
                             </div>
                         </div>
                         
@@ -264,16 +321,16 @@ class App {
                                 <label>País:</label>
                                 <select id="paisOferta">
                                     <option value="">Seleccionar...</option>
-                                    <option value="Argentina">Argentina</option>
-                                    <option value="Chile">Chile</option>
+                                    <option value="Argentina" ${oferta.ubicacion.pais === 'Argentina' ? 'selected' : ''}>Argentina</option>
+                                    <option value="Chile" ${oferta.ubicacion.pais === 'Chile' ? 'selected' : ''}>Chile</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Provincia:</label>
                                 <select id="provinciaOferta">
                                     <option value="">Seleccionar...</option>
-                                    <option value="Buenos Aires">Buenos Aires</option>
-                                    <option value="Córdoba">Córdoba</option>
+                                    <option value="Buenos Aires" ${oferta.ubicacion.provincia === 'Buenos Aires' ? 'selected' : ''}>Buenos Aires</option>
+                                    <option value="Córdoba" ${oferta.ubicacion.provincia === 'Córdoba' ? 'selected' : ''}>Córdoba</option>
                                 </select>
                             </div>
                         </div>
@@ -282,8 +339,8 @@ class App {
                             <label>Localidad:</label>
                             <select id="localidadOferta">
                                 <option value="">Seleccionar...</option>
-                                <option value="La Plata">La Plata</option>
-                                <option value="Berazategui">Berazategui</option>
+                                <option value="La Plata" ${oferta.ubicacion.localidad === 'La Plata' ? 'selected' : ''}>La Plata</option>
+                                <option value="Berazategui" ${oferta.ubicacion.localidad === 'Berazategui' ? 'selected' : ''}>Berazategui</option>
                             </select>
                         </div>
                     </div>
@@ -293,7 +350,7 @@ class App {
                         <div class="form-group">
                             <label>Empresa:</label>
                             <div class="search-input-group">
-                                <input type="text" id="empresaOferta" list="listaEmpresas" placeholder="Buscar empresa...">
+                                <input type="text" id="empresaOferta" list="listaEmpresas" placeholder="Buscar empresa..." value="${oferta.empresa?.nombre || ''}">
                                 <datalist id="listaEmpresas">
                                     ${empresasOptions}
                                 </datalist>
@@ -304,7 +361,7 @@ class App {
                         <div class="form-group">
                             <label>Candidato:</label>
                             <div class="search-input-group">
-                                <input type="text" id="candidatoOferta" list="listaCandidatos" placeholder="Buscar candidato...">
+                                <input type="text" id="candidatoOferta" list="listaCandidatos" placeholder="Buscar candidato..." value="${oferta.candidato?.nombre || ''}">
                                 <datalist id="listaCandidatos">
                                     ${candidatosOptions}
                                 </datalist>
@@ -315,7 +372,7 @@ class App {
                     
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="app.guardarOferta()">Guardar</button>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('ofertas')">Cancelar</button>
+                        <button class="btn btn-secondary" onclick="app.cancelarEdicionOferta()">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -635,6 +692,31 @@ class App {
     }
 
     renderPostulaciones() {
+        const oferta = this.data.ofertas.find(o => o.id === this.ofertaSeleccionadaId);
+        const tituloOferta = oferta ? oferta.titulo : 'Oferta';
+        const postulaciones = this.data.postulaciones.filter(p => !this.ofertaSeleccionadaId || p.ofertaId === this.ofertaSeleccionadaId);
+        const filas = postulaciones.map(p => {
+            const candidatoId = p.candidato?.id || null;
+            const candidatoNombre = p.candidato?.nombre || 'Sin candidato';
+            return `
+                <tr>
+                    <td>${p.estado}</td>
+                    <td>${p.fecha}</td>
+                    <td><a href="#" style="cursor:pointer; color:#0066cc; text-decoration:underline;" onclick="app.mostrarDetalleCandidato(${candidatoId}); return false;">${candidatoNombre}</a></td>
+                    <td>
+                        <button class="icon-btn edit" onclick="app.editarPostulacion(${p.id})" title="Editar">✎</button>
+                        <button class="icon-btn delete" onclick="app.eliminarPostulacion(${p.id})" title="Eliminar">🗑</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        const filasVacias = postulaciones.length === 0 ? `
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #999;">Sin postulaciones registradas</td>
+            </tr>
+        ` : '';
+
         return `
             <div class="container">
                 <div class="header">
@@ -660,9 +742,8 @@ class App {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 40px; color: #999;">Sin postulaciones registradas</td>
-                                </tr>
+                                ${filas}
+                                ${filasVacias}
                             </tbody>
                         </table>
                     </div>
@@ -672,39 +753,66 @@ class App {
                     </div>
                 </div>
             </div>
+
+            <!-- Modal genérico para detalles -->
+            <div id="modalDetalle" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.45); z-index: 2000;">
+                <div style="position:absolute; top:50%; left:50%; transform: translate(-50%, -50%); background:white; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.25); width:420px; max-width:90%;">
+                    <div style="padding:16px 20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                        <h3 id="modalDetalleTitulo" style="margin:0; font-size:18px;">Detalle</h3>
+                        <button style="border:none; background:none; font-size:18px; cursor:pointer;" onclick="app.cerrarModalDetalle()">×</button>
+                    </div>
+                    <div id="modalDetalleContenido" style="padding:16px 20px; white-space:pre-line; line-height:1.4;"></div>
+                    <div style="padding:12px 20px; border-top:1px solid #eee; display:flex; justify-content:flex-end;">
+                        <button class="btn btn-secondary" onclick="app.cerrarModalDetalle()">Cerrar</button>
+                    </div>
+                </div>
+            </div>
         `;
     }
 
     renderAltaPostulacion() {
+        const postulacion = this.editingPostulacion || {
+            fecha: new Date().toISOString().split('T')[0],
+            estado: 'En Revisión',
+            candidato: { nombre: '' }
+        };
+        const tituloPantalla = this.editingPostulacion ? 'Editar Postulación' : 'Registrar Postulación';
+        const candidatosOptions = this.data.candidatos ? this.data.candidatos.map(c => `<option value="${c.nombre}">`).join('') : '';
+        
         return `
             <div class="container">
                 <div class="header">
-                    <h1>Registrar Postulación</h1>
+                    <h1>${tituloPantalla}</h1>
                 </div>
                 <div style="padding: 20px;">
                     <div class="form-row">
                         <div class="form-group">
                             <label>Fecha:</label>
-                            <input type="date" placeholder="">
+                            <input type="date" id="fechaPostulacion" value="${postulacion.fecha}">
                         </div>
                         <div class="form-group">
                             <label>Estado:</label>
-                            <select>
-                                <option>En Revisión</option>
-                                <option>Aceptado</option>
-                                <option>Rechazado</option>
+                            <select id="estadoPostulacion">
+                                <option value="En Revisión" ${postulacion.estado === 'En Revisión' ? 'selected' : ''}>En Revisión</option>
+                                <option value="Aceptado" ${postulacion.estado === 'Aceptado' ? 'selected' : ''}>Aceptado</option>
+                                <option value="Rechazado" ${postulacion.estado === 'Rechazado' ? 'selected' : ''}>Rechazado</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label>Buscar Candidato:</label>
-                        <input type="text" placeholder="">
+                        <div class="search-input-group">
+                            <input type="text" id="candidatoPostulacion" list="listaCandidatosPost" placeholder="Ej: Juan Perez" value="${postulacion.candidato?.nombre || ''}">
+                            <datalist id="listaCandidatosPost">
+                                ${candidatosOptions}
+                            </datalist>
+                        </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-primary">Guardar</button>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('postulaciones')">Cancelar</button>
+                        <button class="btn btn-primary" onclick="app.guardarPostulacion()">Guardar</button>
+                        <button class="btn btn-secondary" onclick="app.cancelarEdicionPostulacion()">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -742,6 +850,28 @@ class App {
         }
     }
 
+    irAltaOfertaNueva() {
+        this.editingOferta = null;
+        this.navigateTo('alta-oferta');
+    }
+
+    editarOferta(id) {
+        const oferta = this.data.ofertas.find(o => o.id === id);
+        if (!oferta) return;
+        this.editingOferta = JSON.parse(JSON.stringify(oferta));
+        this.navigateTo('alta-oferta');
+    }
+
+    cancelarEdicionOferta() {
+        this.editingOferta = null;
+        this.navigateTo('ofertas');
+    }
+
+    verPostulacionesOferta(id) {
+        this.ofertaSeleccionadaId = id;
+        this.navigateTo('postulaciones');
+    }
+
     eliminarOferta(id) {
         if (confirm('¿Estás seguro de que deseas eliminar esta oferta?')) {
             this.data.ofertas = this.data.ofertas.filter(o => o.id !== id);
@@ -749,6 +879,129 @@ class App {
             this.render();
             this.attachEventListeners();
         }
+    }
+
+    mostrarDetalleAreaOferta(ofertaId) {
+        const oferta = this.data.ofertas.find(o => o.id === ofertaId);
+        if (!oferta) return;
+        const area = oferta.areaEstudio || 'No especificada';
+        this.mostrarModalDetalle('Área de estudio', `Área: ${area}`);
+    }
+
+    mostrarDetalleEmpresaOferta(ofertaId) {
+        const oferta = this.data.ofertas.find(o => o.id === ofertaId);
+        if (!oferta) return;
+        const empresaId = oferta.empresa?.id;
+        const empresaNombre = oferta.empresa?.nombre || 'No especificada';
+        const empresa = this.data.empresas.find(e => e.id === empresaId) || this.data.empresas.find(e => e.nombre === empresaNombre);
+
+        if (empresa) {
+            const detalle = `Empresa: ${empresa.nombre}\nCUIL: ${empresa.cuil}\nRazón Social: ${empresa.razonSocial}\nDescripción: ${empresa.descripcion || 'N/D'}`;
+            this.mostrarModalDetalle('Detalle de empresa', detalle);
+        } else {
+            this.mostrarModalDetalle('Detalle de empresa', `Empresa: ${empresaNombre}`);
+        }
+    }
+
+    mostrarModalDetalle(titulo, contenido) {
+        const modal = document.getElementById('modalDetalle');
+        const tituloEl = document.getElementById('modalDetalleTitulo');
+        const contenidoEl = document.getElementById('modalDetalleContenido');
+        if (!modal || !tituloEl || !contenidoEl) return;
+
+        tituloEl.textContent = titulo;
+        contenidoEl.textContent = contenido;
+        modal.style.display = 'block';
+
+        modal.onclick = (e) => {
+            if (e.target === modal) this.cerrarModalDetalle();
+        };
+    }
+
+    cerrarModalDetalle() {
+        const modal = document.getElementById('modalDetalle');
+        if (!modal) return;
+        modal.style.display = 'none';
+        modal.onclick = null;
+    }
+
+    mostrarDetalleCandidato(candidatoId) {
+        if (!candidatoId) {
+            alert('Candidato no válido');
+            return;
+        }
+        const candidato = this.data.candidatos.find(c => c.id === candidatoId);
+        if (!candidato) {
+            alert('Candidato no encontrado');
+            return;
+        }
+        const detalle = `Nombre: ${candidato.nombre}\nLegajo: ${candidato.legajo}\nTeléfono: ${candidato.telefono}\nCarrera: ${candidato.carrera}\nGraduado: ${candidato.graduado ? 'Sí' : 'No'}`;
+        this.mostrarModalDetalle('Detalle de Candidato', detalle);
+    }
+
+    editarPostulacion(id) {
+        const postulacion = this.data.postulaciones.find(p => p.id === id);
+        if (!postulacion) return;
+        this.editingPostulacion = JSON.parse(JSON.stringify(postulacion));
+        this.navigateTo('alta-postulacion');
+    }
+
+    eliminarPostulacion(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar esta postulación?')) {
+            this.data.postulaciones = this.data.postulaciones.filter(p => p.id !== id);
+            this.saveData();
+            this.render();
+            this.attachEventListeners();
+        }
+    }
+
+    cancelarEdicionPostulacion() {
+        this.editingPostulacion = null;
+        this.navigateTo('postulaciones');
+    }
+
+    guardarPostulacion() {
+        const fecha = document.getElementById('fechaPostulacion').value;
+        const estado = document.getElementById('estadoPostulacion').value;
+        const candidatoNombre = document.getElementById('candidatoPostulacion').value.trim();
+
+        if (!fecha || !estado || !candidatoNombre) {
+            alert('Completa fecha, estado y candidato');
+            return;
+        }
+
+        const candidato = this.data.candidatos.find(c => c.nombre === candidatoNombre);
+        if (!candidato) {
+            alert('Candidato no encontrado');
+            return;
+        }
+
+        if (this.editingPostulacion) {
+            const idx = this.data.postulaciones.findIndex(p => p.id === this.editingPostulacion.id);
+            if (idx !== -1) {
+                this.data.postulaciones[idx] = {
+                    id: this.editingPostulacion.id,
+                    ofertaId: this.editingPostulacion.ofertaId,
+                    fecha,
+                    estado,
+                    candidato: { id: candidato.id, nombre: candidato.nombre }
+                };
+            }
+            this.editingPostulacion = null;
+        } else {
+            const nuevaPostulacion = {
+                id: Date.now(),
+                ofertaId: this.ofertaSeleccionadaId || null,
+                fecha,
+                estado,
+                candidato: { id: candidato.id, nombre: candidato.nombre }
+            };
+            this.data.postulaciones.push(nuevaPostulacion);
+        }
+
+        this.saveData();
+        alert('Postulación guardada');
+        this.navigateTo('postulaciones');
     }
 
     guardarOferta() {
@@ -789,9 +1042,9 @@ class App {
 
         const empresa = this.data.empresas.find(e => e.nombre === empresaNombre);
         const candidato = this.data.candidatos ? this.data.candidatos.find(c => c.nombre === candidatoNombre) : null;
-
+        const baseEstado = this.editingOferta ? this.editingOferta.estado : 'Activa';
         const nuevaOferta = {
-            id: Date.now(), // ID simple basado en timestamp
+            id: this.editingOferta ? this.editingOferta.id : Date.now(),
             titulo,
             fechaLimite,
             categoria,
@@ -809,12 +1062,20 @@ class App {
                 id: candidato ? candidato.id : null,
                 nombre: candidatoNombre
             },
-            estado: 'Activa'
+            estado: baseEstado
         };
 
-        this.data.ofertas.push(nuevaOferta);
+        if (this.editingOferta) {
+            const idx = this.data.ofertas.findIndex(o => o.id === this.editingOferta.id);
+            if (idx !== -1) {
+                this.data.ofertas[idx] = nuevaOferta;
+            }
+            this.editingOferta = null;
+        } else {
+            this.data.ofertas.push(nuevaOferta);
+        }
+
         this.saveData();
-        
         alert('Oferta guardada correctamente');
         this.navigateTo('ofertas');
     }
