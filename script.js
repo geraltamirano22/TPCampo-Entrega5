@@ -364,7 +364,6 @@ class App {
                         <div class="tabs" style="display: flex; border-bottom: 2px solid #f3f4f6; background: #f9fafb;">
                             <button class="tab active" data-tab="oferta" style="flex: 1; padding: 16px 24px; border: none; background: white; cursor: pointer; font-weight: 600; color: #667eea; border-bottom: 3px solid #667eea; transition: all 0.2s; font-size: 14px;">Oferta</button>
                             <button class="tab" data-tab="ubicacion" style="flex: 1; padding: 16px 24px; border: none; background: transparent; cursor: pointer; font-weight: 500; color: #6b7280; transition: all 0.2s; font-size: 14px;">Ubicación</button>
-                            <button class="tab" data-tab="entidades" style="flex: 1; padding: 16px 24px; border: none; background: transparent; cursor: pointer; font-weight: 500; color: #6b7280; transition: all 0.2s; font-size: 14px;">Entidades</button>
                         </div>
                         
                         <div style="padding: 32px;">
@@ -420,8 +419,8 @@ class App {
                                 </div>
                             </div>
                             
-                            <div class="tab-content" data-content="ubicacion" style="display: none;">
-                                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 24px; margin-bottom: 24px;">
+                            <div class="tab-content" data-content="ubicacion">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                                     <div>
                                         <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Calle:</label>
                                         <input type="text" id="calleOferta" value="${oferta.ubicacion.calle}" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
@@ -449,7 +448,6 @@ class App {
                                         <select id="paisOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                             <option value="">Seleccionar...</option>
                                             <option value="Argentina" ${oferta.ubicacion.pais === 'Argentina' ? 'selected' : ''}>Argentina</option>
-                                            <option value="Chile" ${oferta.ubicacion.pais === 'Chile' ? 'selected' : ''}>Chile</option>
                                         </select>
                                     </div>
                                     <div>
@@ -457,18 +455,19 @@ class App {
                                         <select id="provinciaOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                             <option value="">Seleccionar...</option>
                                             <option value="Buenos Aires" ${oferta.ubicacion.provincia === 'Buenos Aires' ? 'selected' : ''}>Buenos Aires</option>
-                                            <option value="Córdoba" ${oferta.ubicacion.provincia === 'Córdoba' ? 'selected' : ''}>Córdoba</option>
                                         </select>
                                     </div>
                                 </div>
                                 
-                                <div>
-                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Localidad:</label>
-                                    <select id="localidadOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
-                                        <option value="">Seleccionar...</option>
-                                        <option value="La Plata" ${oferta.ubicacion.localidad === 'La Plata' ? 'selected' : ''}>La Plata</option>
-                                        <option value="Berazategui" ${oferta.ubicacion.localidad === 'Berazategui' ? 'selected' : ''}>Berazategui</option>
-                                    </select>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Localidad:</label>
+                                        <select id="localidadOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                            <option value="">Seleccionar...</option>
+                                            <option value="La Plata" ${oferta.ubicacion.localidad === 'La Plata' ? 'selected' : ''}>La Plata</option>
+                                            <option value="Berazategui" ${oferta.ubicacion.localidad === 'Berazategui' ? 'selected' : ''}>Berazategui</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 
                                 <div style="margin-top: 32px; padding-top: 24px; border-top: 2px solid #f3f4f6; display: flex; gap: 12px; justify-content: flex-end;">
@@ -477,30 +476,6 @@ class App {
                                 </div>
                             </div>
                             
-                            <div class="tab-content" data-content="entidades" style="display: none;">
-                                <div style="margin-bottom: 24px;">
-                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Empresa:</label>
-                                    <div style="display: flex; gap: 12px;">
-                                        <input type="text" id="empresaOferta" list="listaEmpresas" placeholder="Buscar empresa..." value="${oferta.empresa?.nombre || ''}" style="flex: 1; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
-                                        <datalist id="listaEmpresas">${empresasOptions}</datalist>
-                                        <button onclick="app.navigateTo('alta-empresa', 'alta-oferta')" style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; box-shadow: 0 2px 4px rgba(102,126,234,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'" title="Nueva Empresa">+ Nueva</button>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Candidato:</label>
-                                    <div style="display: flex; gap: 12px;">
-                                        <input type="text" id="candidatoOferta" list="listaCandidatos" placeholder="Buscar candidato..." value="${oferta.candidato?.nombre || ''}" style="flex: 1; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
-                                        <datalist id="listaCandidatos">${candidatosOptions}</datalist>
-                                        <button onclick="app.navigateTo('alta-candidato', 'alta-oferta')" style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; box-shadow: 0 2px 4px rgba(102,126,234,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'" title="Nuevo Candidato">+ Nuevo</button>
-                                    </div>
-                                </div>
-                                
-                                <div style="margin-top: 32px; padding-top: 24px; border-top: 2px solid #f3f4f6; display: flex; gap: 12px; justify-content: flex-end;">
-                                    <button onclick="app.cancelarEdicionOferta()" style="padding: 12px 28px; background: white; border: 2px solid #e5e7eb; color: #6b7280; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#e5e7eb'">Cancelar</button>
-                                    <button onclick="app.guardarOferta()" style="padding: 12px 28px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(102,126,234,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(102,126,234,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(102,126,234,0.3)'">Guardar</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -823,9 +798,21 @@ class App {
     renderPostulaciones() {
         const oferta = this.data.ofertas.find(o => o.id === this.ofertaSeleccionadaId);
         const tituloOferta = oferta ? oferta.titulo : 'Oferta';
-        const postulaciones = this.data.postulaciones
+        
+        let postulaciones = this.data.postulaciones
             .filter(p => !this.ofertaSeleccionadaId || p.ofertaId === this.ofertaSeleccionadaId)
             .filter(p => p.candidato && p.candidato.nombre); // Filtrar postulaciones sin candidato
+        
+        // Aplicar búsqueda si existe
+        if (this.busquedaPostulacion) {
+            const busqueda = this.busquedaPostulacion.toLowerCase();
+            postulaciones = postulaciones.filter(p => 
+                p.candidato?.nombre.toLowerCase().includes(busqueda) ||
+                p.estado.toLowerCase().includes(busqueda) ||
+                p.fecha.includes(busqueda)
+            );
+        }
+        
         const filas = postulaciones.map(p => {
             const candidatoId = p.candidato?.id || null;
             const candidatoNombre = p.candidato?.nombre || 'Sin candidato';
@@ -872,10 +859,19 @@ class App {
                 </div>
                 <div style="flex: 1; padding: 32px; overflow-y: auto;">
                     <div style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);">
+                        <div style="font-weight: 600; color: #111827; margin-bottom: 16px; font-size: 15px;">Buscar Postulante</div>
                         <div style="display: flex; gap: 12px; align-items: center;">
                             <div style="flex: 1; position: relative;">
-                                <input type="text" placeholder="Buscar postulación..." style="width: 100%; padding: 12px 12px 12px 44px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
-                                <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 18px;">🔍</span>
+                                <input 
+                                    type="text" 
+                                    id="busquedaPostulacion"
+                                    placeholder="Buscar..." 
+                                    value="${this.busquedaPostulacion || ''}"
+                                    onkeyup="app.actualizarBusquedaPostulacion(this.value)"
+                                    style="width: 100%; padding: 12px 44px 12px 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; outline: none;" 
+                                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'" 
+                                    onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                                <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 18px;">🔍</span>
                             </div>
                         </div>
                     </div>
@@ -927,7 +923,7 @@ class App {
         };
         const tituloPantalla = this.editingPostulacion ? 'Editar Postulación' : 'Nueva Postulación';
         const candidatosOptions = this.data.candidatos ? this.data.candidatos.map(c => `<option value="${c.nombre}">`).join('') : '';
-        const deshabilitarCampos = true; // Siempre deshabilitar fecha
+        const deshabilitarFecha = true; // Siempre deshabilitar fecha
         
         return `
             <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
@@ -944,11 +940,11 @@ class App {
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                                 <div>
                                     <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Fecha:</label>
-                                    <input type="date" id="fechaPostulacion" value="${postulacion.fecha}" ${deshabilitarCampos ? 'disabled' : ''} style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none; ${deshabilitarCampos ? 'background: #f9fafb; cursor: not-allowed;' : ''}" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                    <input type="date" id="fechaPostulacion" value="${postulacion.fecha}" ${deshabilitarFecha ? 'disabled' : ''} style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none; ${deshabilitarFecha ? 'background: #f9fafb; cursor: not-allowed;' : ''}" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                 </div>
                                 <div>
                                     <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Estado:</label>
-                                    <select id="estadoPostulacion" ${deshabilitarCampos ? 'disabled' : ''} style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none; ${deshabilitarCampos ? 'background: #f9fafb; cursor: not-allowed;' : ''}" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                    <select id="estadoPostulacion" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                         <option value="En Revisión" ${postulacion.estado === 'En Revisión' ? 'selected' : ''}>En Revisión</option>
                                         <option value="Aceptado" ${postulacion.estado === 'Aceptado' ? 'selected' : ''}>Aceptado</option>
                                         <option value="Rechazado" ${postulacion.estado === 'Rechazado' ? 'selected' : ''}>Rechazado</option>
@@ -981,9 +977,27 @@ class App {
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const tabName = tab.getAttribute('data-tab');
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                
+                // Remover estilos activos de todos los tabs
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.style.background = 'transparent';
+                    t.style.color = '#6b7280';
+                    t.style.fontWeight = '500';
+                    t.style.borderBottom = 'none';
+                });
+                
+                // Remover active de todos los contenidos
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Activar el tab clickeado
                 tab.classList.add('active');
+                tab.style.background = 'white';
+                tab.style.color = '#667eea';
+                tab.style.fontWeight = '600';
+                tab.style.borderBottom = '3px solid #667eea';
+                
+                // Mostrar el contenido correspondiente
                 document.querySelector(`[data-content="${tabName}"]`).classList.add('active');
             });
         });
@@ -1562,19 +1576,18 @@ class App {
                                     placeholder="Buscar por título, categoría o descripción..." 
                                     value="${this.busquedaOferta}"
                                     onkeyup="app.actualizarBusqueda(this.value)"
-                                    style="width: 100%; padding: 12px 12px 12px 44px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; outline: none;"
+                                    style="width: 100%; padding: 12px 44px 12px 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; outline: none;"
                                     onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'"
                                     onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
-                                <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 18px;">🔍</span>
+                                <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 18px;">🔍</span>
                             </div>
                             <button 
                                 onclick="app.navegarAltaOferta()"
-                                style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(102,126,234,0.3); transition: all 0.2s;"
+                                style="padding: 12px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(102,126,234,0.3); transition: all 0.2s;"
                                 onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(102,126,234,0.4)'"
                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(102,126,234,0.3)'"
                                 title="Nueva oferta">
-                                <span style="font-size: 18px;">+</span>
-                                <span>Nueva oferta</span>
+                                +
                             </button>
                         </div>
                     </div>
@@ -1614,7 +1627,30 @@ class App {
 
     actualizarBusqueda(valor) {
         this.busquedaOferta = valor;
-        this.render();
+        
+        // Cancelar el timeout anterior si existe
+        if (this.busquedaTimeout) {
+            clearTimeout(this.busquedaTimeout);
+        }
+        
+        // Establecer un nuevo timeout para renderizar después de 300ms
+        this.busquedaTimeout = setTimeout(() => {
+            this.render();
+        }, 300);
+    }
+
+    actualizarBusquedaPostulacion(valor) {
+        this.busquedaPostulacion = valor;
+        
+        // Cancelar el timeout anterior si existe
+        if (this.busquedaPostulacionTimeout) {
+            clearTimeout(this.busquedaPostulacionTimeout);
+        }
+        
+        // Establecer un nuevo timeout para renderizar después de 300ms
+        this.busquedaPostulacionTimeout = setTimeout(() => {
+            this.render();
+        }, 300);
     }
 
     navegarAltaOferta() {
