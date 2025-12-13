@@ -335,20 +335,30 @@ class App {
     }
 
     renderAltaOferta() {
-        const oferta = this.editingOferta || {
+        let oferta = this.editingOferta || {
             titulo: '',
             fechaLimite: '',
             categoria: '',
             descripcion: '',
             modalidad: 'Presencial',
             areaEstudio: '',
-            ubicacion: { calle: '', numero: '', piso: '', depto: '', pais: '', provincia: '', localidad: '' },
-            empresa: { nombre: '' },
-            candidato: { nombre: '' }
+            ubicacion: { calle: '', numero: '', piso: '', depto: '', pais: 'Argentina', provincia: 'Buenos Aires', localidad: '' }
         };
+        
+        // Asegurar que ubicacion existe y tiene todos los campos
+        if (this.editingOferta && this.editingOferta.ubicacion) {
+            oferta.ubicacion = {
+                calle: this.editingOferta.ubicacion.calle || '',
+                numero: this.editingOferta.ubicacion.numero || '',
+                piso: this.editingOferta.ubicacion.piso || '',
+                depto: this.editingOferta.ubicacion.depto || '',
+                pais: this.editingOferta.ubicacion.pais || 'Argentina',
+                provincia: this.editingOferta.ubicacion.provincia || 'Buenos Aires',
+                localidad: this.editingOferta.ubicacion.localidad || ''
+            };
+        }
+        
         const tituloPantalla = this.editingOferta ? 'Editar Oferta' : 'Nueva Oferta';
-        const empresasOptions = this.data.empresas.map(e => `<option value="${e.nombre}">`).join('');
-        const candidatosOptions = this.data.candidatos ? this.data.candidatos.map(c => `<option value="${c.nombre}">`).join('') : '';
 
         return `
             <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
@@ -1028,7 +1038,30 @@ class App {
     editarOferta(id) {
         const oferta = this.data.ofertas.find(o => o.id === id);
         if (!oferta) return;
-        this.editingOferta = JSON.parse(JSON.stringify(oferta));
+        
+        // Asegurar que la oferta tenga todos los campos necesarios
+        this.editingOferta = {
+            id: oferta.id,
+            titulo: oferta.titulo || '',
+            fechaLimite: oferta.fechaLimite || '',
+            categoria: oferta.categoria || '',
+            descripcion: oferta.descripcion || '',
+            modalidad: oferta.modalidad || 'Presencial',
+            areaEstudio: oferta.areaEstudio || '',
+            ubicacion: {
+                calle: oferta.ubicacion?.calle || '',
+                numero: oferta.ubicacion?.numero || '',
+                piso: oferta.ubicacion?.piso || '',
+                depto: oferta.ubicacion?.depto || '',
+                pais: oferta.ubicacion?.pais || 'Argentina',
+                provincia: oferta.ubicacion?.provincia || 'Buenos Aires',
+                localidad: oferta.ubicacion?.localidad || ''
+            },
+            empresaId: oferta.empresaId,
+            estadoValidacion: oferta.estadoValidacion || 'Pendiente',
+            estadoOperativo: oferta.estadoOperativo || 'Activa'
+        };
+        
         this.navigateTo('alta-oferta');
     }
 
@@ -1206,7 +1239,7 @@ class App {
         }
 
         const nuevaOferta = {
-            id: this.editingOferta ? this.editingOferta.id : this.data.nextOfertaId++,
+            id: this.editingOferta ? this.editingOferta.id : this.nextOfertaId++,
             titulo,
             fechaLimite,
             categoria,
@@ -1664,3 +1697,4 @@ class App {
 }
 
 const app = new App();
+window.app = app;
