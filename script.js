@@ -1189,16 +1189,12 @@ class App {
         const pais = document.getElementById('paisOferta').value;
         const provincia = document.getElementById('provinciaOferta').value;
         const localidad = document.getElementById('localidadOferta').value;
-        
-        const empresaNombre = document.getElementById('empresaOferta').value;
-        const candidatoNombre = document.getElementById('candidatoOferta').value;
 
-        if (!titulo || !fechaLimite || !categoria || !empresaNombre || !calle || !numero || !pais || !provincia || !localidad) {
+        if (!titulo || !fechaLimite || !categoria || !calle || !numero || !pais || !provincia || !localidad) {
             let faltantes = [];
             if (!titulo) faltantes.push("Título");
             if (!fechaLimite) faltantes.push("Fecha Límite");
             if (!categoria) faltantes.push("Categoría");
-            if (!empresaNombre) faltantes.push("Empresa");
             if (!calle) faltantes.push("Calle");
             if (!numero) faltantes.push("Número");
             if (!pais) faltantes.push("País");
@@ -1209,11 +1205,8 @@ class App {
             return;
         }
 
-        const empresa = this.data.empresas.find(e => e.nombre === empresaNombre);
-        const candidato = this.data.candidatos ? this.data.candidatos.find(c => c.nombre === candidatoNombre) : null;
-        const baseEstado = this.editingOferta ? this.editingOferta.estado : 'Activa';
         const nuevaOferta = {
-            id: this.editingOferta ? this.editingOferta.id : Date.now(),
+            id: this.editingOferta ? this.editingOferta.id : this.data.nextOfertaId++,
             titulo,
             fechaLimite,
             categoria,
@@ -1223,15 +1216,9 @@ class App {
             ubicacion: {
                 calle, numero, piso, depto, pais, provincia, localidad
             },
-            empresa: {
-                id: empresa ? empresa.id : null,
-                nombre: empresaNombre
-            },
-            candidato: {
-                id: candidato ? candidato.id : null,
-                nombre: candidatoNombre
-            },
-            estado: baseEstado
+            empresaId: this.empresaActual,
+            estadoValidacion: this.editingOferta ? this.editingOferta.estadoValidacion : 'Pendiente',
+            estadoOperativo: this.editingOferta ? this.editingOferta.estadoOperativo : 'Activa'
         };
 
         if (this.editingOferta) {
@@ -1246,7 +1233,7 @@ class App {
 
         this.saveData();
         alert('Oferta guardada correctamente');
-        this.navigateTo('ofertas');
+        this.navigateTo('gestion-ofertas-empresa');
     }
 
     guardarEmpresa() {
