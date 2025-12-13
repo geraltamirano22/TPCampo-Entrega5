@@ -340,7 +340,7 @@ class App {
             fechaLimite: '',
             categoria: '',
             descripcion: '',
-            modalidad: 'Presencial',
+            modalidad: '',
             areaEstudio: '',
             ubicacion: { calle: '', numero: '', piso: '', depto: '', pais: 'Argentina', provincia: 'Buenos Aires', localidad: '' }
         };
@@ -378,19 +378,22 @@ class App {
                         
                         <div style="padding: 32px;">
                             <div class="tab-content active" data-content="oferta">
+                                <div style="margin-bottom: 16px; color: #6b7280; font-size: 12px;">
+                                    <span style="color: #dc2626; font-weight: 700;">*</span> Campos obligatorios
+                                </div>
                                 <div style="margin-bottom: 24px;">
-                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Título:</label>
-                                    <input type="text" id="tituloOferta" placeholder="Título de la oferta" value="${oferta.titulo}" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Título <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                    <input type="text" id="tituloOferta" placeholder="Título de la oferta" value="${oferta.titulo}" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                 </div>
                                 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Fecha Límite:</label>
-                                        <input type="date" id="fechaLimiteOferta" value="${oferta.fechaLimite}" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Fecha Límite <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <input type="date" id="fechaLimiteOferta" value="${oferta.fechaLimite}" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                     </div>
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Categoría:</label>
-                                        <select id="categoriaOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Categoría <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <select id="categoriaOferta" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                             <option value="">Seleccionar...</option>
                                             <option value="IT" ${oferta.categoria === 'IT' ? 'selected' : ''}>IT</option>
                                             <option value="Administrativo" ${oferta.categoria === 'Administrativo' ? 'selected' : ''}>Administrativo</option>
@@ -400,22 +403,23 @@ class App {
                                 </div>
                                 
                                 <div style="margin-bottom: 24px;">
-                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Descripción:</label>
-                                    <textarea id="descripcionOferta" placeholder="Inserte una descripción..." style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-height: 120px; transition: all 0.2s; outline: none; resize: vertical;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">${oferta.descripcion}</textarea>
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Descripción <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                    <textarea id="descripcionOferta" placeholder="Inserte una descripción..." required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-height: 120px; transition: all 0.2s; outline: none; resize: vertical;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">${oferta.descripcion}</textarea>
                                 </div>
                                 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Modalidad:</label>
-                                        <select id="modalidadOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Modalidad <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <select id="modalidadOferta" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                            <option value="">Seleccionar...</option>
                                             <option value="Presencial" ${oferta.modalidad === 'Presencial' ? 'selected' : ''}>Presencial</option>
                                             <option value="Remoto" ${oferta.modalidad === 'Remoto' ? 'selected' : ''}>Remoto</option>
                                             <option value="Híbrido" ${oferta.modalidad === 'Híbrido' ? 'selected' : ''}>Híbrido</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Área de estudio:</label>
-                                        <select id="areaEstudioOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Área de estudio <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <select id="areaEstudioOferta" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                             <option value="">Seleccionar...</option>
                                             <option value="Tecnología" ${oferta.areaEstudio === 'Tecnología' ? 'selected' : ''}>Tecnología</option>
                                             <option value="Administración" ${oferta.areaEstudio === 'Administración' ? 'selected' : ''}>Administración</option>
@@ -430,14 +434,17 @@ class App {
                             </div>
                             
                             <div class="tab-content" data-content="ubicacion">
+                                <div style="margin-bottom: 16px; color: #6b7280; font-size: 12px;">
+                                    <span style="color: #dc2626; font-weight: 700;">*</span> Campos obligatorios
+                                </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Calle:</label>
-                                        <input type="text" id="calleOferta" value="${oferta.ubicacion.calle}" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Calle <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <input type="text" id="calleOferta" value="${oferta.ubicacion.calle}" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                     </div>
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Número:</label>
-                                        <input type="text" id="numeroOferta" value="${oferta.ubicacion.numero}" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Número <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <input type="text" id="numeroOferta" value="${oferta.ubicacion.numero}" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                     </div>
                                 </div>
                                 
@@ -454,15 +461,15 @@ class App {
                                 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">País:</label>
-                                        <select id="paisOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">País <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <select id="paisOferta" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                             <option value="">Seleccionar...</option>
                                             <option value="Argentina" ${oferta.ubicacion.pais === 'Argentina' ? 'selected' : ''}>Argentina</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Provincia:</label>
-                                        <select id="provinciaOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Provincia <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <select id="provinciaOferta" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                             <option value="">Seleccionar...</option>
                                             <option value="Buenos Aires" ${oferta.ubicacion.provincia === 'Buenos Aires' ? 'selected' : ''}>Buenos Aires</option>
                                         </select>
@@ -471,8 +478,8 @@ class App {
                                 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                                     <div>
-                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Localidad:</label>
-                                        <select id="localidadOferta" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Localidad <span style="color: #dc2626; font-weight: 700;">*</span>:</label>
+                                        <select id="localidadOferta" required aria-required="true" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                             <option value="">Seleccionar...</option>
                                             <option value="La Plata" ${oferta.ubicacion.localidad === 'La Plata' ? 'selected' : ''}>La Plata</option>
                                             <option value="Berazategui" ${oferta.ubicacion.localidad === 'Berazategui' ? 'selected' : ''}>Berazategui</option>
@@ -934,6 +941,7 @@ class App {
         const tituloPantalla = this.editingPostulacion ? 'Editar Postulación' : 'Nueva Postulación';
         const candidatosOptions = this.data.candidatos ? this.data.candidatos.map(c => `<option value="${c.nombre}">`).join('') : '';
         const deshabilitarFecha = true; // Siempre deshabilitar fecha
+        const deshabilitarCandidato = !!this.editingPostulacion;
         
         return `
             <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
@@ -963,8 +971,8 @@ class App {
                             </div>
                             
                             <div style="margin-bottom: 32px;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Buscar Candidato:</label>
-                                <input type="text" id="candidatoPostulacion" list="listaCandidatosPost" placeholder="Ej: Juan Perez" value="${postulacion.candidato?.nombre || ''}" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Candidato:</label>
+                                <input type="text" id="candidatoPostulacion" list="listaCandidatosPost" placeholder="Ej: Juan Perez" value="${postulacion.candidato?.nombre || ''}" ${deshabilitarCandidato ? 'disabled' : ''} style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.2s; outline: none; ${deshabilitarCandidato ? 'background: #f9fafb; cursor: not-allowed;' : ''}" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
                                 <datalist id="listaCandidatosPost">
                                     ${candidatosOptions}
                                 </datalist>
@@ -1046,7 +1054,7 @@ class App {
             fechaLimite: oferta.fechaLimite || '',
             categoria: oferta.categoria || '',
             descripcion: oferta.descripcion || '',
-            modalidad: oferta.modalidad || 'Presencial',
+            modalidad: oferta.modalidad || '',
             areaEstudio: oferta.areaEstudio || '',
             ubicacion: {
                 calle: oferta.ubicacion?.calle || '',
@@ -1167,13 +1175,30 @@ class App {
         const estado = document.getElementById('estadoPostulacion').value;
         const candidatoNombre = document.getElementById('candidatoPostulacion').value.trim();
 
-        if (!fecha || !estado || !candidatoNombre) {
+        if (!fecha || !estado || (!this.editingPostulacion && !candidatoNombre)) {
             alert('Completa fecha, estado y candidato');
             return;
         }
 
-        const candidato = this.data.candidatos.find(c => c.nombre === candidatoNombre);
-        if (!candidato) {
+        let candidato = null;
+        if (this.editingPostulacion) {
+            const candidatoId = this.editingPostulacion.candidato?.id;
+            if (candidatoId) {
+                candidato = this.data.candidatos.find(c => c.id === candidatoId) || null;
+            }
+            if (!candidato) {
+                const nombreOriginal = this.editingPostulacion.candidato?.nombre;
+                candidato = this.data.candidatos.find(c => c.nombre === nombreOriginal) || null;
+            }
+            if (!candidato) {
+                // Fallback: conservar lo que ya tenía la postulación
+                candidato = this.editingPostulacion.candidato || null;
+            }
+        } else {
+            candidato = this.data.candidatos.find(c => c.nombre === candidatoNombre) || null;
+        }
+
+        if (!candidato || !candidato.nombre) {
             alert('Candidato no encontrado');
             return;
         }
@@ -1223,11 +1248,14 @@ class App {
         const provincia = document.getElementById('provinciaOferta').value;
         const localidad = document.getElementById('localidadOferta').value;
 
-        if (!titulo || !fechaLimite || !categoria || !calle || !numero || !pais || !provincia || !localidad) {
+        if (!titulo || !fechaLimite || !categoria || !descripcion?.trim() || !modalidad || !areaEstudio || !calle || !numero || !pais || !provincia || !localidad) {
             let faltantes = [];
             if (!titulo) faltantes.push("Título");
             if (!fechaLimite) faltantes.push("Fecha Límite");
             if (!categoria) faltantes.push("Categoría");
+            if (!descripcion?.trim()) faltantes.push("Descripción");
+            if (!modalidad) faltantes.push("Modalidad");
+            if (!areaEstudio) faltantes.push("Área de estudio");
             if (!calle) faltantes.push("Calle");
             if (!numero) faltantes.push("Número");
             if (!pais) faltantes.push("País");
@@ -1553,8 +1581,8 @@ class App {
                     <td style="padding: 16px 20px;">
                         <div style="display: flex; gap: 8px; align-items: center;">
                             ${puedeVerPostulaciones ? 
-                                `<button onclick="app.verPostulacionesOferta(${oferta.id})" style="padding: 6px 14px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Ver postulaciones (${postulaciones})</button>` : 
-                                `<span style="color: #d1d5db; font-size: 12px; font-weight: 500;">Sin acceso</span>`
+                                `<button onclick="app.verPostulacionesOferta(${oferta.id})" style="width: 190px; display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: background 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Ver postulaciones (${postulaciones})</button>` : 
+                                `<span style="width: 190px; display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border: 1px solid #e5e7eb; border-radius: 6px; background: #f9fafb; color: #9ca3af; font-size: 12px; font-weight: 500; white-space: nowrap;">Sin acceso</span>`
                             }
                             <button onclick="app.editarOferta(${oferta.id})" style="padding: 6px 10px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; color: #6b7280; font-size: 13px; transition: all 0.2s;" title="Editar" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">✏️</button>
                         </div>
