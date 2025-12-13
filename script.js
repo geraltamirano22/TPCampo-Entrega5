@@ -124,16 +124,16 @@ class App {
                 { id: 4, nombre: 'Global Services', cuil: '20-11111111-2', razonSocial: 'Global Services Inc', descripcion: 'Servicios globales' }
             ],
             candidatos: [
-                { id: 1, nombre: 'Juan Perez', legajo: '12345', telefono: '1123456789', carrera: 'Ingeniería Informática', graduado: true },
-                { id: 2, nombre: 'María García', legajo: '12346', telefono: '1187654321', carrera: 'Ingeniería en Sistemas', graduado: false },
-                { id: 3, nombre: 'Carlos López', legajo: '12347', telefono: '1155555555', carrera: 'Administración', graduado: true },
+                { id: 1, nombre: 'Juan Perez', legajo: '12345', telefono: '1123456789', carrera: 'Ingeniería en Sistemas de Información', graduado: true },
+                { id: 2, nombre: 'María García', legajo: '12346', telefono: '1187654321', carrera: 'Ingeniería Civil', graduado: false },
+                { id: 3, nombre: 'Carlos López', legajo: '12347', telefono: '1155555555', carrera: 'Ingeniería Industrial', graduado: true },
                 { id: 4, nombre: 'Ana Martínez', legajo: '12348', telefono: '1144444444', carrera: 'Ingeniería Industrial', graduado: false },
-                { id: 5, nombre: 'Pedro Rodríguez', legajo: '12349', telefono: '1133333333', carrera: 'Ingeniería Electrónica', graduado: true },
-                { id: 6, nombre: 'Laura Fernández', legajo: '12350', telefono: '1166666666', carrera: 'Licenciatura en Administración', graduado: true },
-                { id: 7, nombre: 'Diego Sánchez', legajo: '12351', telefono: '1177777777', carrera: 'Ingeniería en Sistemas', graduado: false },
-                { id: 8, nombre: 'Sofia Gómez', legajo: '12352', telefono: '1188888888', carrera: 'Contaduría Pública', graduado: true },
+                { id: 5, nombre: 'Pedro Rodríguez', legajo: '12349', telefono: '1133333333', carrera: 'Ingeniería Eléctrica', graduado: true },
+                { id: 6, nombre: 'Laura Fernández', legajo: '12350', telefono: '1166666666', carrera: 'Ingeniería Mecánica', graduado: true },
+                { id: 7, nombre: 'Diego Sánchez', legajo: '12351', telefono: '1177777777', carrera: 'Ingeniería en Sistemas de Información', graduado: false },
+                { id: 8, nombre: 'Sofia Gómez', legajo: '12352', telefono: '1188888888', carrera: 'Ingeniería Química', graduado: true },
                 { id: 9, nombre: 'Martín Torres', legajo: '12353', telefono: '1199999999', carrera: 'Ingeniería Química', graduado: false },
-                { id: 10, nombre: 'Valentina Ruiz', legajo: '12354', telefono: '1111111111', carrera: 'Diseño Gráfico', graduado: true }
+                { id: 10, nombre: 'Valentina Ruiz', legajo: '12354', telefono: '1111111111', carrera: 'Ingeniería Civil', graduado: true }
             ],
             postulaciones: [
                 { id: 1, ofertaId: 1, candidato: { id: 1, nombre: 'Juan Perez' }, fecha: '2025-12-01', estado: 'En Revisión' },
@@ -169,6 +169,17 @@ class App {
         this.nextOfertaId = 9;
         this.nextPostulacionId = 27;
         this.init();
+    }
+
+    updateBodyModuleTheme() {
+        const ofertasPages = new Set([
+            'gestion-ofertas-empresa',
+            'ofertas',
+            'alta-oferta',
+            'postulaciones',
+            'alta-postulacion'
+        ]);
+        document.body.classList.toggle('module-ofertas', ofertasPages.has(this.currentPage));
     }
 
     saveData() {
@@ -225,6 +236,8 @@ class App {
         } else if (this.currentPage === 'alta-postulacion') {
             app.innerHTML = this.renderAltaPostulacion();
         }
+
+        this.updateBodyModuleTheme();
         
         window.scrollTo(0, 0);
     }
@@ -361,10 +374,10 @@ class App {
         const tituloPantalla = this.editingOferta ? 'Editar Oferta' : 'Nueva Oferta';
 
         return `
-            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
                 <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 16px 24px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📝</div>
+                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📝</div>
                         <span style="color: white; font-weight: 600; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">${tituloPantalla}</span>
                     </div>
                 </div>
@@ -429,7 +442,7 @@ class App {
                                 
                                 <div style="margin-top: 32px; padding-top: 24px; border-top: 2px solid #f3f4f6; display: flex; gap: 12px; justify-content: flex-end;">
                                     <button onclick="app.cancelarEdicionOferta()" style="padding: 12px 28px; background: white; border: 2px solid #e5e7eb; color: #6b7280; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#e5e7eb'">Cancelar</button>
-                                    <button onclick="app.guardarOferta()" style="padding: 12px 28px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(102,126,234,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(102,126,234,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(102,126,234,0.3)'">Guardar</button>
+                                    <button onclick="app.guardarOferta()" style="padding: 12px 28px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(50,118,183,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(50,118,183,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(50,118,183,0.3)'">Guardar</button>
                                 </div>
                             </div>
                             
@@ -489,7 +502,7 @@ class App {
                                 
                                 <div style="margin-top: 32px; padding-top: 24px; border-top: 2px solid #f3f4f6; display: flex; gap: 12px; justify-content: flex-end;">
                                     <button onclick="app.cancelarEdicionOferta()" style="padding: 12px 28px; background: white; border: 2px solid #e5e7eb; color: #6b7280; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#e5e7eb'">Cancelar</button>
-                                    <button onclick="app.guardarOferta()" style="padding: 12px 28px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(102,126,234,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(102,126,234,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(102,126,234,0.3)'">Guardar</button>
+                                    <button onclick="app.guardarOferta()" style="padding: 12px 28px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(50,118,183,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(50,118,183,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(50,118,183,0.3)'">Guardar</button>
                                 </div>
                             </div>
                             
@@ -717,9 +730,12 @@ class App {
                         <label>Carrera:</label>
                         <select id="carreraCandidato">
                             <option value="Seleccionar...">Seleccionar...</option>
-                            <option value="Ingeniería Informática" ${candidato.carrera === 'Ingeniería Informática' ? 'selected' : ''}>Ingeniería Informática</option>
-                            <option value="Ingeniería en Sistemas" ${candidato.carrera === 'Ingeniería en Sistemas' ? 'selected' : ''}>Ingeniería en Sistemas</option>
-                            <option value="Administración" ${candidato.carrera === 'Administración' ? 'selected' : ''}>Administración</option>
+                            <option value="Ingeniería Mecánica" ${candidato.carrera === 'Ingeniería Mecánica' ? 'selected' : ''}>Ingeniería Mecánica</option>
+                            <option value="Ingeniería Eléctrica" ${candidato.carrera === 'Ingeniería Eléctrica' ? 'selected' : ''}>Ingeniería Eléctrica</option>
+                            <option value="Ingeniería Industrial" ${candidato.carrera === 'Ingeniería Industrial' ? 'selected' : ''}>Ingeniería Industrial</option>
+                            <option value="Ingeniería Química" ${candidato.carrera === 'Ingeniería Química' ? 'selected' : ''}>Ingeniería Química</option>
+                            <option value="Ingeniería en Sistemas de Información" ${candidato.carrera === 'Ingeniería en Sistemas de Información' ? 'selected' : ''}>Ingeniería en Sistemas de Información</option>
+                            <option value="Ingeniería Civil" ${candidato.carrera === 'Ingeniería Civil' ? 'selected' : ''}>Ingeniería Civil</option>
                         </select>
                     </div>
                     
@@ -867,10 +883,10 @@ class App {
         ` : '';
 
         return `
-            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
                 <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">👥</div>
+                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">👥</div>
                         <span style="color: white; font-weight: 600; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">Postulaciones - ${tituloOferta}</span>
                     </div>
                 </div>
@@ -886,7 +902,7 @@ class App {
                                     value="${this.busquedaPostulacion || ''}"
                                     onkeyup="app.actualizarBusquedaPostulacion(this.value)"
                                     style="width: 100%; padding: 12px 44px 12px 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; outline: none;" 
-                                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'" 
+                                    onfocus="this.style.borderColor='#3276b7'; this.style.boxShadow='0 0 0 3px rgba(50,118,183,0.12)'" 
                                     onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
                                 <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 18px;">🔍</span>
                             </div>
@@ -944,10 +960,10 @@ class App {
         const deshabilitarCandidato = !!this.editingPostulacion;
         
         return `
-            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
                 <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 16px 24px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📋</div>
+                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📋</div>
                         <span style="color: white; font-weight: 600; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">${tituloPantalla}</span>
                     </div>
                 </div>
@@ -980,7 +996,7 @@ class App {
                             
                             <div style="padding-top: 24px; border-top: 2px solid #f3f4f6; display: flex; gap: 12px; justify-content: flex-end;">
                                 <button onclick="app.cancelarEdicionPostulacion()" style="padding: 12px 28px; background: white; border: 2px solid #e5e7eb; color: #6b7280; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#e5e7eb'">Cancelar</button>
-                                <button onclick="app.guardarPostulacion()" style="padding: 12px 28px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(102,126,234,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(102,126,234,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(102,126,234,0.3)'">Guardar</button>
+                                <button onclick="app.guardarPostulacion()" style="padding: 12px 28px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(50,118,183,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(50,118,183,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(50,118,183,0.3)'">Guardar</button>
                             </div>
                         </div>
                     </div>
@@ -1600,12 +1616,12 @@ class App {
         ` : '';
 
         return `
-            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <div style="width: 100%; min-height: 100vh; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
                 
                 <!-- Barra de título -->
                 <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 16px 24px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">🏢</div>
+                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">🏢</div>
                         <span style="color: white; font-weight: 600; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">${empresa?.nombre || 'Gestión de Ofertas'}</span>
                     </div>
                 </div>
@@ -1625,15 +1641,15 @@ class App {
                                     value="${this.busquedaOferta}"
                                     onkeyup="app.actualizarBusqueda(this.value)"
                                     style="width: 100%; padding: 12px 44px 12px 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; box-sizing: border-box; transition: all 0.2s; outline: none;"
-                                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'"
+                                    onfocus="this.style.borderColor='#3276b7'; this.style.boxShadow='0 0 0 3px rgba(50,118,183,0.12)'"
                                     onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
                                 <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 18px;">🔍</span>
                             </div>
                             <button 
                                 onclick="app.navegarAltaOferta()"
-                                style="padding: 12px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(102,126,234,0.3); transition: all 0.2s;"
-                                onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(102,126,234,0.4)'"
-                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(102,126,234,0.3)'"
+                                style="padding: 12px 16px; background: linear-gradient(135deg, #3276b7 0%, #245a8a 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(50,118,183,0.3); transition: all 0.2s;"
+                                onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px rgba(50,118,183,0.4)'"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(50,118,183,0.3)'"
                                 title="Nueva oferta">
                                 +
                             </button>

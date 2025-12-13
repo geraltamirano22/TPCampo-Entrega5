@@ -10,6 +10,43 @@ body {
     overflow-x: hidden;
 }
 
+body.module-ofertas {
+    background: linear-gradient(135deg, #3276b7 0%, #2b67a0 55%, #245a8a 100%);
+}
+
+body.module-ofertas .header {
+    background: linear-gradient(to bottom, #3276b7, #245a8a);
+    border-bottom-color: #1f4c74;
+}
+
+body.module-ofertas .menu-btn {
+    border-color: #3276b7;
+    color: #3276b7;
+}
+
+body.module-ofertas .menu-btn:hover {
+    background: #3276b7;
+}
+
+body.module-ofertas .btn-primary {
+    background: #3276b7;
+    border-color: #3276b7;
+}
+
+body.module-ofertas .btn-primary:hover {
+    background: #245a8a;
+}
+
+body.module-ofertas .icon-btn:hover,
+body.module-ofertas .icon-btn.edit:hover {
+    color: #3276b7;
+}
+
+body.module-ofertas .tab.active {
+    color: #3276b7;
+    border-bottom-color: #3276b7;
+}
+
 .container {
     max-width: 1200px;
     margin: 20px auto;
